@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 / 注册 - CampusConnect</title>
+
+  <!-- 引入外部 CSS 文件，href 是路径，css 文件夹下的 login.css -->
+  <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+
+  <!-- 整个页面的最外层容器，用来做居中背景 -->
+  <div class="page-wrapper">
+
+    <!-- 卡片容器：白色登录框 -->
+    <div class="card">
+
+      <!-- ① Logo 区域 -->
+      <div class="logo-area">
+        <!-- 绿色圆角方块 logo -->
+        <div class="logo-icon">C</div>
+        <h1 class="logo-text">CampusConnect</h1>
+        <p class="logo-sub">校园综合服务平台</p>
+      </div>
+
+      <!-- ② Tab 切换：登录 / 注册 -->
+      <!-- 点击"登录"显示登录表单，点击"注册"显示注册表单 -->
+      <div class="tabs">
+        <!-- class="tab-btn active" 表示当前选中的是登录 -->
+        <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">登录</button>
+        <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">注册</button>
+      </div>
+
+      <!-- ③ 登录表单 -->
+      <!-- id="formLogin" 让 JS 能找到这个表单 -->
+      <form id="formLogin">
+
+        <div class="form-group">
+          <!-- label 的 for="username" 要和 input 的 id="username" 一致 -->
+          <label for="username">用户名</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            placeholder="请输入用户名"
+          >
+          <!-- 错误提示：默认隐藏，JS 验证不通过时显示 -->
+          <span class="error-tip" id="usernameErr"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="password">密码</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="请输入密码（至少6位）"
+          >
+          <span class="error-tip" id="passwordErr"></span>
+        </div>
+
+        <!-- type="button" 防止自动提交，交给 JS 处理 -->
+        <button type="button" class="btn-submit" onclick="handleLogin()">登录</button>
+
+        <p class="form-footer">
+          没有账号？
+          <!-- 点击切换到注册表单 -->
+          <a href="#" onclick="switchTab('register')">立即注册</a>
+        </p>
+
+      </form>
+
+      <!-- ④ 注册表单（默认隐藏，style="display:none"） -->
+      <form id="formRegister" style="display:none">
+
+        <div class="form-group">
+          <label for="regUsername">用户名</label>
+          <input
+            type="text"
+            id="regUsername"
+            name="username"
+            placeholder="请输入用户名（2-10个字符）"
+          >
+          <span class="error-tip" id="regUsernameErr"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="regNickname">昵称</label>
+          <input
+            type="text"
+            id="regNickname"
+            name="nickname"
+            placeholder="显示给其他人看的名字"
+          >
+          <span class="error-tip" id="regNicknameErr"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="regPassword">密码</label>
+          <input
+            type="password"
+            id="regPassword"
+            name="password"
+            placeholder="请输入密码（至少6位）"
+          >
+          <span class="error-tip" id="regPasswordErr"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="regConfirm">确认密码</label>
+          <input
+            type="password"
+            id="regConfirm"
+            name="confirm"
+            placeholder="再输入一次密码"
+          >
+          <span class="error-tip" id="regConfirmErr"></span>
+        </div>
+
+        <button type="button" class="btn-submit" onclick="handleRegister()">注册</button>
+
+        <p class="form-footer">
+          已有账号？
+          <a href="#" onclick="switchTab('login')">去登录</a>
+        </p>
+
+      </form>
+
+    </div>
+    <!-- card 结束 -->
+
+  </div>
+  <!-- page-wrapper 结束 -->
+
+  <!-- 在 body 最后引入 JS 文件（要在 HTML 渲染完之后才加载） -->
+  <script src="js/login.js"></script>
+
+</body>
+</html>
