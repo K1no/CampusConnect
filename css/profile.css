@@ -1,0 +1,211 @@
+/* ===================================================
+   profile.css —— 个人中心专属样式
+   公共样式（导航栏、按钮等）已在 style.css 里定义
+   这里只写个人中心页面特有的样式
+   =================================================== */
+
+/* ── 1. 两栏布局 ──────────────────────────────────
+   左边：用户信息（固定宽度）
+   右边：发布记录（占剩余空间）
+   display: flex 让两个子元素横向排列
+   gap: 24px     两栏之间的间距
+   align-items: flex-start 让两栏顶部对齐（不拉伸等高）
+*/
+.profile-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/* ── 2. 左侧边栏 ──────────────────────────────────
+   width: 280px    固定宽度 280px
+   flex-shrink: 0  禁止被压缩（防止右侧内容太多时左栏变窄）
+   position: sticky + top: 88px  让左栏粘在屏幕上，滚动时不跟着走
+*/
+.profile-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 24px;
+  position: sticky;
+  top: 88px; /* 导航栏高度(64px) + 一点间距 */
+}
+
+/* ── 3. 头像区域 ──────────────────────────────────
+   text-align: center 让里面所有内容居中
+*/
+.avatar-area {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* 头像圆圈 */
+.avatar-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;           /* 50% = 正圆 */
+  background: #10b981;          /* 绿色背景 */
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;          /* 水平居中，下方 12px 间距 */
+}
+
+.profile-nickname {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.profile-username {
+  font-size: 0.85rem;
+  color: #9ca3af;               /* 浅灰色 */
+}
+
+/* ── 4. 统计数字行 ────────────────────────────────
+   display: flex         四个数字横向排列
+   justify-content: space-around  均匀分布
+*/
+.stats-row {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+  padding: 16px 0;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #10b981;               /* 绿色数字 */
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+/* ── 5. 分割线 ────────────────────────────────────*/
+.divider {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 20px 0;
+}
+
+/* ── 6. 编辑昵称区域 ──────────────────────────────*/
+.edit-section { }
+
+.edit-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+/* 提示文字（成功是绿色，错误是红色，由 JS 控制）*/
+.edit-tip {
+  display: block;
+  font-size: 0.78rem;
+  margin-top: 4px;
+  min-height: 16px;
+}
+.edit-tip.success { color: #10b981; }
+.edit-tip.error   { color: #ef4444; }
+
+/* ── 7. 右侧内容区 ────────────────────────────────
+   flex: 1  占满左栏之外的所有剩余空间
+*/
+.profile-content {
+  flex: 1;
+  min-width: 0; /* 防止内容溢出 */
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 16px;
+}
+
+/* ── 8. 发布记录列表项 ────────────────────────────*/
+.post-item {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  /* 鼠标悬浮时有过渡效果 */
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.post-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);  /* 向上移动 1px，有浮起感 */
+}
+
+/* 每条记录左边的图标 */
+.post-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: #f0fdf4;          /* 浅绿色背景 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;               /* 禁止图标被压缩 */
+}
+
+/* 记录的文字内容区 */
+.post-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.post-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+  /* 超出一行用省略号 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.post-meta {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+/* 记录右边的删除按钮 */
+.post-delete {
+  padding: 5px 12px;
+  border: 1px solid #fca5a5;    /* 浅红色边框 */
+  border-radius: 6px;
+  background: transparent;
+  color: #ef4444;               /* 红色文字 */
+  font-size: 0.8rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.post-delete:hover {
+  background: #fee2e2;          /* 悬浮时浅红色背景 */
+}

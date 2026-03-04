@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>失物招领 - CampusConnect</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon">C</div>
+    CampusConnect
+  </a>
+  <div class="nav-links">
+    <a href="index.html">首页</a>
+    <a href="news.html">校园资讯</a>
+    <a href="trade.html">二手交易</a>
+    <a href="lost.html" class="active">失物招领</a>
+    <a href="forum.html">校园广场</a>
+  </div>
+  <div class="nav-right" id="nav-user-area"></div>
+</nav>
+
+<main class="page-main">
+  <div class="container">
+
+    <div class="page-header">
+      <h1 class="page-title">🔍 失物招领</h1>
+      <button class="btn btn-primary" onclick="requireLogin(() => openModal('lostPublishModal'))">
+        + 发布信息
+      </button>
+    </div>
+
+    <!-- 筛选栏：类型 Tab + 搜索框 -->
+    <div class="filter-bar">
+      <div class="tabs" id="lostTabs">
+        <button class="tab-btn active" data-type="all">全部</button>
+        <button class="tab-btn" data-type="lost">丢失物品</button>
+        <button class="tab-btn" data-type="found">拾到物品</button>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="lost-search" placeholder="搜索物品名称/地点…">
+        <button onclick="renderLost()">🔍</button>
+      </div>
+    </div>
+
+    <!-- 失物列表，由 lost.js 动态填充 -->
+    <div class="lost-list" id="lostList">
+      <div class="loading-tip">正在加载信息...</div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="footer">© 2026 CampusConnect 校园综合服务平台 · Web综合设计实践项目</footer>
+
+<!-- 发布失物/拾物弹窗 -->
+<div class="modal-overlay" id="lostPublishModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">发布失物/拾物信息</span>
+      <button class="modal-close" onclick="closeModal('lostPublishModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">信息类型 <span class="required">*</span></label>
+        <select class="form-control" id="lostType">
+          <option value="lost">丢失物品</option>
+          <option value="found">拾到物品</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">物品名称 <span class="required">*</span></label>
+        <input type="text" class="form-control" id="lostName" placeholder="请输入物品名称">
+        <div class="form-error" id="lostNameErr">物品名称不能为空</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">丢失/拾到地点 <span class="required">*</span></label>
+        <input type="text" class="form-control" id="lostPlace" placeholder="请输入具体地点">
+        <div class="form-error" id="lostPlaceErr">地点不能为空</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">丢失/拾到时间 <span class="required">*</span></label>
+        <input type="date" class="form-control" id="lostTime">
+        <div class="form-error" id="lostTimeErr">请选择时间</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">物品描述及联系方式 <span class="required">*</span></label>
+        <textarea class="form-control" id="lostDesc" rows="4" placeholder="请描述物品特征、联系方式等"></textarea>
+        <div class="form-error" id="lostDescErr">描述不能为空</div>
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="submitLost()">发布</button>
+    </div>
+  </div>
+</div>
+
+<!-- 失物详情弹窗 -->
+<div class="modal-overlay" id="lostDetailModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title" id="lostDetailTitle"></span>
+      <button class="modal-close" onclick="closeModal('lostDetailModal')">×</button>
+    </div>
+    <div class="modal-body" id="lostDetailBody"></div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script src="js/lost.js"></script>
+</body>
+</html>

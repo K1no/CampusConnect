@@ -1,0 +1,357 @@
+/* ===================================================
+   pages.css —— 资讯、交易、失物、广场 四个页面共用样式
+   在 news.html / trade.html / lost.html / forum.html 均引入此文件
+   =================================================== */
+
+/* ── 筛选栏 ───────────────────────────────────────*/
+.filter-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+/* 价格筛选区 */
+.price-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.price-filter input {
+  width: 90px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  outline: none;
+}
+.price-filter input:focus { border-color: var(--primary); }
+
+/* ── 资讯列表（news.html）────────────────────────*/
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.news-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.news-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* 资讯封面图（没有图片时显示渐变色块）*/
+.news-cover {
+  height: 140px;
+  background: linear-gradient(135deg, var(--primary-light), #ffffff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+.news-cover img { width: 100%; height: 100%; object-fit: cover; }
+
+.news-card-body { padding: 14px; }
+.news-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.news-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* 资讯详情弹窗内容 */
+.detail-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.detail-content {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--text-main);
+  white-space: pre-wrap; /* 保留换行 */
+}
+
+/* ── 二手商品列表（trade.html）───────────────────*/
+.trade-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.trade-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.trade-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* 商品图片占位 */
+.trade-cover {
+  height: 160px;
+  background: var(--bg-page);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+}
+.trade-cover img { width: 100%; height: 100%; object-fit: cover; }
+
+.trade-card-body { padding: 12px; }
+.trade-card-name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.trade-card-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--danger);
+  margin-bottom: 6px;
+}
+.trade-card-meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* 商品详情弹窗 */
+.trade-detail-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--danger);
+  margin: 12px 0;
+}
+.trade-detail-info {
+  background: var(--bg-page);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 16px;
+}
+.trade-detail-info p {
+  font-size: 0.9rem;
+  color: var(--text-sub);
+  margin-bottom: 6px;
+}
+.trade-detail-info p:last-child { margin-bottom: 0; }
+.trade-detail-info strong { color: var(--text-main); }
+
+/* ── 失物招领列表（lost.html）────────────────────*/
+.lost-list { display: flex; flex-direction: column; gap: 14px; }
+
+.lost-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.lost-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+/* 失物类型图标 */
+.lost-type-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+.lost-type-icon.lost  { background: #fee2e2; }  /* 丢失：红色背景 */
+.lost-type-icon.found { background: #d1fae5; }  /* 拾到：绿色背景 */
+
+.lost-card-info { flex: 1; min-width: 0; }
+.lost-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+.lost-card-meta {
+  font-size: 0.82rem;
+  color: var(--text-sub);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* 右侧：找到/未找到状态 */
+.lost-card-status { flex-shrink: 0; }
+
+/* 标记已找到按钮 */
+.btn-found {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-found:hover { background: #a7f3d0; }
+
+/* ── 校园广场（forum.html）───────────────────────*/
+
+/* 快速发帖框 */
+.quick-post {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 24px;
+}
+.quick-post-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  align-items: center;
+}
+
+/* 帖子列表 */
+.forum-list { display: flex; flex-direction: column; gap: 14px; }
+
+.forum-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.forum-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.forum-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* 发帖人头像 */
+.forum-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-dark);
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.forum-card-user { font-size: 0.88rem; font-weight: 600; color: var(--text-main); }
+.forum-card-time { font-size: 0.78rem; color: var(--text-muted); }
+
+.forum-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+.forum-card-content {
+  font-size: 0.88rem;
+  color: var(--text-sub);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.forum-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+/* 回复区 */
+.reply-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+.reply-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 14px; color: var(--text-main); }
+.reply-input { margin-top: 14px; }
+
+.reply-item {
+  background: var(--bg-page);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-bottom: 10px;
+  font-size: 0.88rem;
+}
+.reply-item-user { font-weight: 600; color: var(--primary); margin-bottom: 4px; }
+.reply-item-content { color: var(--text-main); line-height: 1.6; }
+.reply-item-time { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+
+/* 删除按钮（自己发的内容才显示）*/
+.btn-delete-post {
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #fca5a5;
+  background: transparent;
+  color: var(--danger);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-left: auto;
+}
+.btn-delete-post:hover { background: #fee2e2; }
+
+/* 加载提示 */
+.loading-tip {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}

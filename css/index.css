@@ -1,0 +1,207 @@
+/* ===================================================
+   index.css —— 首页专属样式
+   =================================================== */
+
+/* ── 轮播图 ───────────────────────────────────────*/
+.hero-section {
+  position: relative;
+  height: 420px;
+  overflow: hidden;
+}
+
+.hero-slides {
+  display: flex;
+  height: 100%;
+  transition: transform 0.5s ease;
+}
+
+/* 每张幻灯片 */
+.hero-slide {
+  min-width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+}
+
+/* 三张幻灯片背景色（没有图片时的备用方案）*/
+.slide-1 { background: linear-gradient(135deg, #10b981, #059669); }
+.slide-2 { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.slide-3 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+/* 幻灯片文字内容 */
+.hero-content {
+  text-align: center;
+  color: #ffffff;
+  padding: 20px;
+}
+
+.hero-content h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.hero-content p {
+  font-size: 1.05rem;
+  margin-bottom: 24px;
+  opacity: 0.9;
+}
+
+/* 幻灯片按钮：白色描边 */
+.hero-content .btn-primary {
+  background: rgba(255,255,255,0.2);
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  backdrop-filter: blur(4px);
+}
+.hero-content .btn-primary:hover {
+  background: #ffffff;
+  color: var(--primary);
+}
+
+/* 左右箭头 */
+.hero-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  color: #ffffff;
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+  backdrop-filter: blur(4px);
+}
+.hero-arrow:hover { background: rgba(255,255,255,0.45); }
+.hero-arrow.prev { left: 20px; }
+.hero-arrow.next { right: 20px; }
+
+/* 底部指示点 */
+.hero-dots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.hero-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.hero-dot.active {
+  background: #ffffff;
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* ── 区块标题 ─────────────────────────────────────*/
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.section-title { font-size: 1.3rem; font-weight: 700; color: var(--text-main); }
+.section-sub   { font-size: 0.88rem; color: var(--text-muted); margin-top: 2px; }
+
+/* ── 模块入口卡片 ─────────────────────────────────*/
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.module-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px 16px;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.module-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(16,185,129,0.15);
+  transform: translateY(-3px);
+}
+
+.module-icon { font-size: 2.2rem; margin-bottom: 12px; }
+.module-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: var(--text-main); }
+.module-card p  { font-size: 0.82rem; color: var(--text-sub); line-height: 1.5; }
+
+/* ── 预览卡片网格 ─────────────────────────────────*/
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* 预览卡片 */
+.preview-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: inherit;
+}
+.preview-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--primary);
+}
+
+.preview-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.preview-card-meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* 价格高亮（二手板块）*/
+.preview-price {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--danger);
+  margin: 6px 0;
+}
+
+/* 加载提示 */
+.loading-tip {
+  color: var(--text-muted);
+  padding: 20px;
+  text-align: center;
+  font-size: 0.9rem;
+}

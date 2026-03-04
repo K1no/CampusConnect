@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人中心 - CampusConnect</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/profile.css">
+</head>
+<body>
+
+<!-- ① 导航栏 -->
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon">C</div>
+    CampusConnect
+  </a>
+  <div class="nav-links">
+    <a href="index.html">首页</a>
+    <a href="news.html">校园资讯</a>
+    <a href="trade.html">二手交易</a>
+    <a href="lost.html">失物招领</a>
+    <a href="forum.html">校园广场</a>
+  </div>
+  <!-- 导航栏右侧：由 main.js 动态填充 -->
+  <div class="nav-right" id="nav-user-area"></div>
+</nav>
+
+<main class="page-main">
+  <div class="container">
+
+    <div class="profile-layout">
+
+      <!-- ② 左侧：用户信息卡片 -->
+      <aside class="profile-sidebar">
+
+        <!-- 头像区域 -->
+        <div class="avatar-area">
+          <!-- 头像圆圈，显示昵称第一个字 -->
+          <!-- id="avatarCircle" 让 JS 能找到它并修改内容 -->
+          <div class="avatar-circle" id="avatarCircle">?</div>
+          <h2 class="profile-nickname" id="profileNickname">加载中...</h2>
+          <p class="profile-username" id="profileUsername">@username</p>
+        </div>
+
+        <!-- 统计数字：发布了多少条内容 -->
+        <div class="stats-row">
+          <div class="stat-item">
+            <!-- id 让 JS 填入真实数字 -->
+            <div class="stat-num" id="statNews">0</div>
+            <div class="stat-label">资讯</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num" id="statTrade">0</div>
+            <div class="stat-label">交易</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num" id="statLost">0</div>
+            <div class="stat-label">失物</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num" id="statForum">0</div>
+            <div class="stat-label">广场</div>
+          </div>
+        </div>
+
+        <!-- 分割线 -->
+        <hr class="divider">
+
+        <!-- 编辑昵称区域 -->
+        <div class="edit-section">
+          <h3 class="edit-title">修改昵称</h3>
+          <div class="form-group">
+            <input
+              type="text"
+              class="form-control"
+              id="newNickname"
+              placeholder="输入新昵称"
+            >
+            <!-- 错误/成功提示 -->
+            <span class="edit-tip" id="nicknameTip"></span>
+          </div>
+          <!-- 点击调用 JS 的 updateNickname 函数 -->
+          <button class="btn btn-primary" onclick="updateNickname()">保存修改</button>
+        </div>
+
+        <hr class="divider">
+
+        <!-- 退出登录按钮 -->
+        <!-- btn-danger 是红色按钮的 class，在 style.css 里定义 -->
+        <button class="btn btn-danger" style="width:100%" onclick="logout()">退出登录</button>
+
+      </aside>
+
+      <!-- ③ 右侧：我发布的内容 -->
+      <section class="profile-content">
+
+        <h2 class="section-title">我发布的内容</h2>
+
+        <!-- Tab 切换：选择查看哪类发布记录 -->
+        <div class="tabs" id="profileTabs">
+          <button class="tab-btn active" data-type="news">校园资讯</button>
+          <button class="tab-btn" data-type="trade">二手交易</button>
+          <button class="tab-btn" data-type="lost">失物招领</button>
+          <button class="tab-btn" data-type="forum">校园广场</button>
+        </div>
+
+        <!-- 发布记录列表，由 JS 动态填充 -->
+        <div id="myPostsList">
+          <!-- 加载中占位 -->
+          <div class="empty-state">
+            <div class="empty-icon">UPLOADING...</div>
+            <p>加载中...</p>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+    <!-- profile-layout 结束 -->
+
+  </div>
+</main>
+
+<footer class="footer">© 2026 CampusConnect 校园综合服务平台</footer>
+
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script src="js/profile.js"></script>
+</body>
+</html>
