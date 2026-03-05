@@ -86,7 +86,7 @@ async function handleLogin() {
     // 把后台返回的数据解析成 JS 对象
     const result = await response.json();
 
-    if (result.code === 200) {
+    if (result.code === 0) {
       // 登录成功：把用户信息保存到 localStorage（浏览器本地存储）
       // 这样其他页面也能读到登录状态
       localStorage.setItem('cc_user', JSON.stringify(result.data));
@@ -165,7 +165,7 @@ async function handleRegister() {
 
     const result = await response.json();
 
-    if (result.code === 200) {
+    if (result.code === 0) {
       // 注册成功，切换到登录 Tab，提示用户去登录
       alert('注册成功！请登录');
       switchTab('login');

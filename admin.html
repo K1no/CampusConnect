@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Console - CampusConnect</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .admin-panel { padding: 24px; }
+    .admin-tools { display:flex; gap:8px; align-items:center; margin-bottom:12px }
+    .admin-list { margin-top:12px; }
+    .admin-row { padding:10px; border-radius:8px; background:#fff; border:1px solid var(--border); margin-bottom:8px; display:flex; justify-content:space-between; gap:12px; }
+    .admin-actions button { margin-left:8px }
+    .admin-form { display:flex; gap:8px; margin-top:12px; align-items:center }
+    .admin-form input { padding:8px; border:1px solid var(--border); border-radius:6px }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo"><div class="logo-icon">C</div>CampusConnect</a>
+    <div class="nav-links"><a href="admin.html" class="active">管理控制台</a></div>
+    <div class="nav-right" id="nav-user-area"></div>
+  </nav>
+
+  <main class="page-main admin-panel container">
+    <h2>管理控制台</h2>
+    <div class="admin-tools">
+      <label>模块：</label>
+      <select id="moduleSelect">
+        <option value="news">资讯 (news)</option>
+        <option value="trade">二手 (trade)</option>
+        <option value="lost">失物 (lost)</option>
+        <option value="forum">广场 (forum)</option>
+        <option value="users">用户 (users)</option>
+      </select>
+      <button class="btn btn-primary" id="loadBtn">加载</button>
+      <button class="btn" id="refreshBtn">刷新</button>
+    </div>
+
+    <div class="admin-form">
+      <input id="newTitle" placeholder="标题 / 用户名（users）">
+      <input id="newContent" placeholder="内容 / nickname / price / location">
+      <input id="newExtra" placeholder="额外字段(type/price/location)">
+      <button class="btn btn-primary" id="addBtn">新增</button>
+    </div>
+
+    <div class="admin-list" id="adminList">选择模块并点击加载</div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

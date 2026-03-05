@@ -231,6 +231,47 @@ input, textarea, select { font-family: inherit; font-size: 1rem; }
 .card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
 .card-body { padding: 16px; }
 
+/* ── 18. 校园广场帖子样式优化 ───────────────────────── */
+.forum-list { display: grid; grid-template-columns: 1fr; gap: 16px; }
+
+.forum-card {
+  background: linear-gradient(180deg, var(--bg-card), #fbfffb);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(16,184,129,0.08);
+  padding: 14px 16px;
+  box-shadow: 0 6px 18px rgba(16,185,129,0.06);
+  transition: transform var(--transition), box-shadow var(--transition);
+  cursor: pointer;
+}
+.forum-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(16,185,129,0.10); }
+
+.forum-card-header { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.forum-avatar {
+  width:44px; height:44px; border-radius:10px; background: linear-gradient(135deg,var(--primary-light), #e6ffef);
+  display:flex; align-items:center; justify-content:center; color:var(--primary-dark); font-weight:700; font-size:1.05rem;
+  box-shadow: 0 4px 10px rgba(16,185,129,0.08);
+}
+.forum-card-user { font-weight:700; color:var(--text-main); }
+.forum-card-time { font-size:0.85rem; color:var(--text-sub); }
+
+.forum-card-title { font-size:1.05rem; font-weight:700; color:var(--text-main); margin:6px 0; }
+.forum-card-content { color:var(--text-sub); font-size:0.96rem; line-height:1.5; max-height:3.6rem; overflow:hidden; text-overflow:ellipsis; }
+
+.forum-card-footer { display:flex; justify-content:space-between; gap:12px; margin-top:12px; color:var(--text-muted); font-size:0.9rem; }
+.forum-card-footer span { display:inline-flex; align-items:center; gap:8px; }
+
+.btn-delete-post { background: transparent; color:var(--danger); border-radius:8px; padding:6px 10px; font-weight:700; border:1px solid rgba(239,68,68,0.08); }
+.btn-delete-post:hover { background: rgba(239,68,68,0.06); }
+
+/* 快速发帖样式 */
+.quick-post { background: var(--bg-card); border:1px solid var(--border); padding:12px; border-radius:10px; margin-bottom:16px; }
+.quick-post-footer { display:flex; gap:8px; margin-top:8px; }
+
+@media (min-width: 900px) {
+  .forum-list { grid-template-columns: 1fr 1fr; }
+}
+
+
 /* ── 8. 页面标题区 ────────────────────────────────*/
 .page-header {
   display: flex;
