@@ -3,16 +3,15 @@
    =================================================== */
 
 let allForum   = [];
-let curForumId = null; // 当前打开详情的帖子 id
+let curForumId = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadForum();
-
-  // 已登录时显示快速发帖框
   if (Auth.isLoggedIn()) {
     const qp = document.getElementById('quickPost');
     if (qp) qp.style.display = 'block';
   }
+  if (typeof initNav === 'function') initNav();
 });
 
 async function loadForum() {
@@ -27,20 +26,19 @@ function renderForum() {
     container.innerHTML = '<div class="empty-state"><div class="empty-icon">💬</div><p>还没有帖子，来发第一帖吧！</p></div>';
     return;
   }
-
   container.innerHTML = allForum.map(item => {
     const user    = item.nickname || item.username || item.author || '匿名用户';
     const initial = (user && user[0]) ? user[0].toUpperCase() : 'U';
     const replies = item.replies ? item.replies.length : 0;
     return `
-      <div class="forum-card" onclick="openForumDetail('${item.id}')">
+      <div class="forum-card" onclick="openForumDetail(${item.id})">
         <div class="forum-card-header">
           <div class="forum-avatar">${initial}</div>
           <div>
             <div class="forum-card-user">${user}</div>
-            <div class="forum-card-time">${formatDate(item.createTime)}</div>
+            <div class="forum-card-time">${formatDate(item.create_time)}</div>
           </div>
-          ${canDelete(item) ? `<button class="btn-delete-post" onclick="event.stopPropagation(); deleteForum('${item.id}')">删除</button>` : ''}
+          ${canDelete(item) ? `<button class="btn-delete-post" onclick="event.stopPropagation(); deleteForum(${item.id})">删除</button>` : ''}
         </div>
         ${item.title ? `<div class="forum-card-title">${item.title}</div>` : ''}
         <div class="forum-card-content">${item.content}</div>
@@ -54,7 +52,8 @@ function renderForum() {
 }
 
 function openForumDetail(id) {
-  const item = allForum.find(i => i.id === id);
+  // id 是数字，用 == 或转换类型查找
+  const item = allForum.find(i => i.id == id);
   if (!item) return;
   curForumId = id;
 
@@ -63,12 +62,10 @@ function openForumDetail(id) {
   document.getElementById('forumDetailBody').innerHTML = `
     <div class="detail-meta">
       <span>👤 ${user}</span>
-      <span>${formatDate(item.createTime)}</span>
+      <span>${formatDate(item.create_time)}</span>
     </div>
     <div class="detail-content">${item.content}</div>
   `;
-
-  // 渲染回复列表
   renderReplies(item.replies || []);
   openModal('forumDetailModal');
 }
@@ -81,9 +78,9 @@ function renderReplies(replies) {
   }
   container.innerHTML = replies.map(r => `
     <div class="reply-item">
-      <div class="reply-item-user">${r.nickname || r.username || r.author}</div>
+      <div class="reply-item-user">${r.nickname || r.username || r.author || '匿名'}</div>
       <div class="reply-item-content">${r.content}</div>
-      <div class="reply-item-time">${formatDate(r.createTime)}</div>
+      <div class="reply-item-time">${formatDate(r.create_time)}</div>
     </div>
   `).join('');
 }
@@ -95,12 +92,7 @@ async function quickPost() {
   if (!content) { showToast('内容不能为空', 'error'); return; }
 
   const user = Auth.getUser();
-  const res  = await API.forum.add({
-    title: title || '',
-    content,
-    username: user.username,
-    nickname: user.nickname || user.username
-  });
+  const res  = await API.forum.add({ title: title || '', content });
 
   if (res.code === 0) {
     showToast('发布成功！');
@@ -118,14 +110,11 @@ async function submitForum() {
   const content = document.getElementById('forumContent').value.trim();
 
   let ok = true;
-  if (!title)            { showFieldErr('forumTitleErr');   ok = false; }
-  if (content.length < 10) { showFieldErr('forumContentErr'); ok = false; }
+  if (!title)               { showFieldErr('forumTitleErr');   ok = false; }
+  if (content.length < 10)  { showFieldErr('forumContentErr'); ok = false; }
   if (!ok) return;
 
-  const user = Auth.getUser();
-  const res  = await API.forum.add({
-    title, content, username: user.username, nickname: user.nickname || user.username
-  });
+  const res = await API.forum.add({ title, content });
 
   if (res.code === 0) {
     showToast('发布成功！');
@@ -144,17 +133,14 @@ async function submitReply() {
   const content = document.getElementById('replyContent').value.trim();
   if (!content) { showToast('回复内容不能为空', 'error'); return; }
 
-  const user = Auth.getUser();
-  const res  = await API.forum.reply(curForumId, {
-    content, username: user.username, nickname: user.nickname || user.username
-  });
+  const res = await API.forum.reply(curForumId, { content });
 
   if (res.code === 0) {
     showToast('回复成功！');
     document.getElementById('replyContent').value = '';
     await loadForum();
     // 刷新详情弹窗里的回复列表
-    const updated = allForum.find(i => i.id === curForumId);
+    const updated = allForum.find(i => i.id == curForumId);
     if (updated) renderReplies(updated.replies || []);
   } else {
     showToast(res.msg || '回复失败', 'error');
@@ -166,8 +152,11 @@ async function deleteForum(id) {
   if (!confirm('确定删除这条帖子？')) return;
   const res = await API.forum.remove(id);
   if (res.code === 0) {
-    showToast('删除成功'); await loadForum();
-  } else showToast(res.msg || '删除失败', 'error');
+    showToast('删除成功');
+    await loadForum();
+  } else {
+    showToast(res.msg || '删除失败', 'error');
+  }
 }
 
 function canDelete(item) {

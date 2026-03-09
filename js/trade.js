@@ -1,5 +1,6 @@
 /* ===================================================
-   trade.js —— 二手交易页逻辑
+   trade.js —— 二手交易页逻辑（完整修复版）
+   修复：表单字段名与 HTML 对齐，code 判断改为 0
    =================================================== */
 
 const CAT_NAME = { book: '📚 书籍', electronics: '💻 电子', daily: '🛋️ 生活', other: '📦 其他' };
@@ -17,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadTrade() {
   const res = await API.trade.list();
-  allTrade  = res.code === 200 ? res.data : [];
+  allTrade  = res.code === 0 ? res.data : [];
   renderTrade();
 }
 
@@ -42,10 +43,10 @@ function renderTrade() {
       <div class="trade-cover">${CAT_ICON[item.category] || '📦'}</div>
       <div class="trade-card-body">
         <div class="trade-card-name">${item.title}</div>
-        <div class="trade-card-price">¥${parseFloat(item.price).toFixed(2)}</div>
+        <div class="trade-card-price">¥${parseFloat(item.price || 0).toFixed(2)}</div>
         <div class="trade-card-meta">
-          <span class="badge badge-gray">${CAT_NAME[item.category] || item.category}</span>
-          <span>${formatDate(item.createdAt)}</span>
+          <span>${CAT_NAME[item.category] || '📦 其他'}</span>
+          <span>${formatDate(item.create_time)}</span>
         </div>
       </div>
     </div>
@@ -53,48 +54,50 @@ function renderTrade() {
 }
 
 function openTradeDetail(id) {
-  const item = allTrade.find(i => i.id === id);
+  const item = allTrade.find(i => i.id == id);
   if (!item) return;
   document.getElementById('tradeDetailTitle').textContent = item.title;
   document.getElementById('tradeDetailBody').innerHTML = `
-    <div class="trade-detail-price">¥${parseFloat(item.price).toFixed(2)}</div>
+    <div class="trade-detail-price">¥${parseFloat(item.price || 0).toFixed(2)}</div>
     <div class="trade-detail-info">
-      <p><strong>品类：</strong>${CAT_NAME[item.category] || item.category}</p>
-      <p><strong>描述：</strong>${item.desc}</p>
-      <p><strong>联系方式：</strong>${item.contact}</p>
-      <p><strong>发布人：</strong>${item.nickname || item.username}</p>
-      <p><strong>发布时间：</strong>${formatDate(item.createdAt)}</p>
+      <p><strong>品类：</strong>${CAT_NAME[item.category] || '其他'}</p>
+      <p><strong>描述：</strong>${item.content || '无'}</p>
+      <p><strong>联系方式：</strong>${item.contact || '未填写'}</p>
+      <p><strong>发布人：</strong>${item.author || '匿名'}</p>
+      <p><strong>发布时间：</strong>${formatDate(item.create_time)}</p>
     </div>
-    ${canDelete(item) ? `<button class="btn btn-danger btn-sm" onclick="deleteTrade(${item.id})">删除</button>` : ''}
+    ${canDelete(item) ? `<button class="btn btn-danger btn-sm" style="margin-top:12px" onclick="deleteTrade(${item.id})">删除</button>` : ''}
   `;
   openModal('tradeDetailModal');
 }
 
 async function submitTrade() {
-  const title   = document.getElementById('tradeTitle').value.trim();
-  const cat     = document.getElementById('tradeCat').value;
-  const price   = document.getElementById('tradePrice').value;
-  const desc    = document.getElementById('tradeDesc').value.trim();
-  const contact = document.getElementById('tradeContact').value.trim();
+  // 字段名严格对应 trade.html 里的 id
+  const title   = (document.getElementById('tradeTitle')?.value   || '').trim();
+  const cat     = (document.getElementById('tradeCat')?.value     || '').trim();
+  const price   = (document.getElementById('tradePrice')?.value   || '').trim();
+  const desc    = (document.getElementById('tradeDesc')?.value    || '').trim();
+  const contact = (document.getElementById('tradeContact')?.value || '').trim();
 
-  let ok = true;
-  if (!title)   { showFieldErr('tradeTitleErr');   ok = false; }
-  if (!cat)     { showFieldErr('tradeCatErr');     ok = false; }
-  if (!price || parseFloat(price) < 0) { showFieldErr('tradePriceErr'); ok = false; }
-  if (!desc)    { showFieldErr('tradeDescErr');    ok = false; }
-  if (!contact) { showFieldErr('tradeContactErr'); ok = false; }
-  if (!ok) return;
+  // 逐项验证
+  if (!title)   { showErr('tradeTitleErr');   return; }
+  if (!cat)     { showErr('tradeCatErr');     return; }
+  if (!price)   { showErr('tradePriceErr');   return; }
+  if (!desc)    { showErr('tradeDescErr');    return; }
+  if (!contact) { showErr('tradeContactErr'); return; }
 
-  const user = Auth.getUser();
-  const res  = await API.trade.add({
-    title, category: cat, price: parseFloat(price),
-    desc, contact, username: user.username, nickname: user.nickname || user.username
+  const res = await API.trade.add({
+    title,
+    category: cat,   // 后端新字段
+    price,
+    content:  desc,  // 后端字段名是 content，存商品描述
+    contact          // 后端新字段
   });
 
-  if (res.code === 200) {
+  if (res.code === 0) {
     showToast('发布成功！');
     closeModal('tradePublishModal');
-    ['tradeTitle','tradeCat','tradePrice','tradeDesc','tradeContact'].forEach(id => {
+    ['tradeTitle', 'tradeCat', 'tradePrice', 'tradeDesc', 'tradeContact'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
@@ -105,21 +108,25 @@ async function submitTrade() {
 }
 
 async function deleteTrade(id) {
-  if (!confirm('确定删除？')) return;
+  if (!confirm('确定删除这条商品？')) return;
   const res = await API.trade.remove(id);
-  if (res.code === 200) {
-    showToast('删除成功'); closeModal('tradeDetailModal'); await loadTrade();
-  } else showToast(res.msg || '删除失败', 'error');
+  if (res.code === 0) {
+    showToast('删除成功');
+    closeModal('tradeDetailModal');
+    await loadTrade();
+  } else {
+    showToast(res.msg || '删除失败', 'error');
+  }
 }
 
 function canDelete(item) {
   const user = Auth.getUser();
-  return user && user.username === item.username;
+  return user && user.username === (item.author || item.username);
 }
 
-function showFieldErr(id) {
+function showErr(id) {
   const el = document.getElementById(id);
-  if (el) { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 3000); }
+  if (el) { el.classList.add('show'); setTimeout(() => el && el.classList.remove('show'), 3000); }
 }
 
 function initTabs(tabsId, onChange) {
@@ -127,7 +134,7 @@ function initTabs(tabsId, onChange) {
     btn.addEventListener('click', () => {
       document.querySelectorAll(`#${tabsId} .tab-btn`).forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      onChange(btn.dataset.type || btn.dataset.cat || 'all');
+      onChange(btn.dataset.cat || btn.dataset.type || 'all');
     });
   });
 }

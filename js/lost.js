@@ -1,20 +1,21 @@
 /* ===================================================
-   lost.js —— 失物招领页逻辑
+   lost.js —— 失物招领页逻辑（已修复）
    =================================================== */
 
-let allLost  = [];
-let curLType = 'all';
+let allLost = [];
+let curLostType = 'all';
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLost();
-  initTabs('lostTabs', (type) => { curLType = type; renderLost(); });
+  initTabs('lostTabs', (type) => { curLostType = type; renderLost(); });
   const s = document.getElementById('lost-search');
   if (s) s.addEventListener('keyup', e => { if (e.key === 'Enter') renderLost(); });
+  if (typeof initNav === 'function') initNav();
 });
 
 async function loadLost() {
   const res = await API.lost.list();
-  allLost   = res.code === 200 ? res.data : [];
+  allLost   = res.code === 0 ? res.data : [];
   renderLost();
 }
 
@@ -23,8 +24,8 @@ function renderLost() {
   const keyword   = (document.getElementById('lost-search')?.value || '').trim().toLowerCase();
 
   let list = allLost
-    .filter(i => curLType === 'all' || i.type === curLType)
-    .filter(i => !keyword || i.name.toLowerCase().includes(keyword) || i.place.toLowerCase().includes(keyword));
+    .filter(i => curLostType === 'all' || (curLostType === 'found' ? i.found : !i.found))
+    .filter(i => !keyword || i.title.toLowerCase().includes(keyword) || (i.location || '').toLowerCase().includes(keyword));
 
   if (!list.length) {
     container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><p>暂无失物信息</p></div>';
@@ -33,42 +34,35 @@ function renderLost() {
 
   container.innerHTML = list.map(item => `
     <div class="lost-card" onclick="openLostDetail(${item.id})">
-      <div class="lost-type-icon ${item.type}">${item.type === 'lost' ? '😢' : '✅'}</div>
+      <div class="lost-card-icon">${item.found ? '🟢' : '🔴'}</div>
       <div class="lost-card-info">
-        <div class="lost-card-title">${item.name}</div>
+        <div class="lost-card-title">${item.title}</div>
         <div class="lost-card-meta">
-          <span>📍 ${item.place}</span>
-          <span>📅 ${item.time || ''}</span>
-          <span>👤 ${item.nickname || item.username}</span>
-          <span>${formatDate(item.createdAt)}</span>
+          <span>📍 ${item.location || '未知地点'}</span>
+          <span>${formatDate(item.create_time)}</span>
+          <span class="badge ${item.found ? 'badge-green' : 'badge-orange'}">${item.found ? '已找到' : '处理中'}</span>
         </div>
-      </div>
-      <div class="lost-card-status">
-        ${item.found
-          ? '<span class="badge badge-green">已找到</span>'
-          : (item.type === 'lost'
-              ? '<span class="badge badge-red">寻找中</span>'
-              : '<span class="badge badge-orange">等待认领</span>')}
       </div>
     </div>
   `).join('');
 }
 
 function openLostDetail(id) {
-  const item = allLost.find(i => i.id === id);
+  const item = allLost.find(i => i.id == id);
   if (!item) return;
-  document.getElementById('lostDetailTitle').textContent = (item.type === 'lost' ? '😢 丢失：' : '✅ 拾到：') + item.name;
+  document.getElementById('lostDetailTitle').textContent = item.title;
   document.getElementById('lostDetailBody').innerHTML = `
-    <div class="trade-detail-info">
-      <p><strong>类型：</strong>${item.type === 'lost' ? '丢失物品' : '拾到物品'}</p>
-      <p><strong>地点：</strong>${item.place}</p>
-      <p><strong>时间：</strong>${item.time || '未填写'}</p>
-      <p><strong>描述：</strong>${item.desc}</p>
-      <p><strong>发布人：</strong>${item.nickname || item.username}</p>
-      <p><strong>状态：</strong>${item.found ? '已找到/已认领' : '处理中'}</p>
+    <div class="detail-meta">
+      <span>👤 ${item.author || '匿名'}</span>
+      <span>📍 ${item.location || '未知地点'}</span>
+      <span>${formatDate(item.create_time)}</span>
+    </div>
+    <div class="detail-content">${item.content}</div>
+    <div class="trade-detail-info" style="margin-top:12px">
+      <p><strong>状态：</strong>${item.found ? '✅ 已找到/已认领' : '🔍 处理中'}</p>
     </div>
     <div style="display:flex; gap:10px; margin-top:12px">
-      ${!item.found && canDelete(item) ? `<button class="btn-found" onclick="markFound(${item.id})">✅ 标记已找到</button>` : ''}
+      ${!item.found && canDelete(item) ? `<button class="btn btn-primary btn-sm" onclick="markFound(${item.id})">✅ 标记已找到</button>` : ''}
       ${canDelete(item) ? `<button class="btn btn-danger btn-sm" onclick="deleteLost(${item.id})">删除</button>` : ''}
     </div>
   `;
@@ -76,26 +70,23 @@ function openLostDetail(id) {
 }
 
 async function submitLost() {
-  const type  = document.getElementById('lostType').value;
-  const name  = document.getElementById('lostName').value.trim();
-  const place = document.getElementById('lostPlace').value.trim();
-  const time  = document.getElementById('lostTime').value;
-  const desc  = document.getElementById('lostDesc').value.trim();
+  const title    = document.getElementById('lostTitle')?.value.trim()
+                || document.getElementById('lostName')?.value.trim() || '';
+  const location = document.getElementById('lostPlace')?.value.trim()
+                || document.getElementById('lostLocation')?.value.trim() || '';
+  const content  = document.getElementById('lostDesc')?.value.trim()
+                || document.getElementById('lostContent')?.value.trim() || '';
 
-  let ok = true;
-  if (!name)  { showFieldErr('lostNameErr');  ok = false; }
-  if (!place) { showFieldErr('lostPlaceErr'); ok = false; }
-  if (!time)  { showFieldErr('lostTimeErr');  ok = false; }
-  if (!desc)  { showFieldErr('lostDescErr');  ok = false; }
-  if (!ok) return;
+  if (!title)   { showToast('请填写物品名称', 'error'); return; }
+  if (!content) { showToast('请填写描述', 'error'); return; }
 
-  const user = Auth.getUser();
-  const res  = await API.lost.add({ type, name, place, time, desc, username: user.username, nickname: user.nickname || user.username });
+  const res = await API.lost.add({ title, location, content });
 
-  if (res.code === 200) {
+  if (res.code === 0) {
     showToast('发布成功！');
     closeModal('lostPublishModal');
-    ['lostName','lostPlace','lostTime','lostDesc'].forEach(id => {
+    // 清空表单
+    ['lostTitle','lostName','lostPlace','lostLocation','lostDesc','lostContent','lostTime'].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = '';
     });
     await loadLost();
@@ -107,22 +98,30 @@ async function submitLost() {
 async function markFound(id) {
   if (!confirm('确认标记为已找到/已认领？')) return;
   const res = await API.lost.found(id);
-  if (res.code === 200) {
-    showToast('已标记！'); closeModal('lostDetailModal'); await loadLost();
-  } else showToast(res.msg || '操作失败', 'error');
+  if (res.code === 0) {
+    showToast('已标记！');
+    closeModal('lostDetailModal');
+    await loadLost();
+  } else {
+    showToast(res.msg || '操作失败', 'error');
+  }
 }
 
 async function deleteLost(id) {
   if (!confirm('确定删除？')) return;
   const res = await API.lost.remove(id);
-  if (res.code === 200) {
-    showToast('删除成功'); closeModal('lostDetailModal'); await loadLost();
-  } else showToast(res.msg || '删除失败', 'error');
+  if (res.code === 0) {
+    showToast('删除成功');
+    closeModal('lostDetailModal');
+    await loadLost();
+  } else {
+    showToast(res.msg || '删除失败', 'error');
+  }
 }
 
 function canDelete(item) {
   const user = Auth.getUser();
-  return user && user.username === item.username;
+  return user && user.username === (item.author || item.username);
 }
 
 function showFieldErr(id) {

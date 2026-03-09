@@ -1,31 +1,26 @@
 /* ===================================================
-   news.js —— 校园资讯页逻辑
+   news.js —— 校园资讯页逻辑（已修复）
    =================================================== */
 
-const TYPE_NAME = { notice: '校园通知', activity: '校园活动', lecture: '学术讲座' };
-const TYPE_ICON = { notice: '📢', activity: '🎉', lecture: '🎓' };
+const TYPE_NAME = { notice: '📢 校园通知', activity: '🎉 校园活动', lecture: '🎓 学术讲座', news: '📰 资讯' };
 
-let allNews   = [];  // 全部数据缓存
-let curType   = 'all';
+let allNews  = [];
+let curType  = 'all';
 
-/* ── 初始化 ───────────────────────────────────────*/
 document.addEventListener('DOMContentLoaded', async () => {
   await loadNews();
   initTabs('newsTabs', (type) => { curType = type; renderNews(); });
-
-  // 搜索框回车触发
-  const searchInput = document.getElementById('news-search');
-  if (searchInput) searchInput.addEventListener('keyup', e => { if (e.key === 'Enter') renderNews(); });
+  const s = document.getElementById('news-search');
+  if (s) s.addEventListener('keyup', e => { if (e.key === 'Enter') renderNews(); });
+  if (typeof initNav === 'function') initNav();
 });
 
-/* ── 加载数据 ─────────────────────────────────────*/
 async function loadNews() {
   const res = await API.news.list();
-  allNews = res.code === 200 ? res.data : [];
+  allNews   = res.code === 0 ? res.data : [];
   renderNews();
 }
 
-/* ── 渲染列表 ─────────────────────────────────────*/
 function renderNews() {
   const container = document.getElementById('newsList');
   const keyword   = (document.getElementById('news-search')?.value || '').trim().toLowerCase();
@@ -40,30 +35,28 @@ function renderNews() {
   }
 
   container.innerHTML = list.map(item => `
-    <div class="news-card" onclick="openDetail(${item.id})">
-      <div class="news-cover">${TYPE_ICON[item.type] || '📰'}</div>
+    <div class="news-card" onclick="openNewsDetail(${item.id})">
+      <div class="news-cover">📰</div>
       <div class="news-card-body">
         <div class="news-card-title">${item.title}</div>
         <div class="news-card-meta">
           <span class="badge badge-green">${TYPE_NAME[item.type] || item.type}</span>
-          <span>${formatDate(item.createdAt)}</span>
+          <span>${formatDate(item.create_time)}</span>
         </div>
       </div>
     </div>
   `).join('');
 }
 
-/* ── 打开详情 ─────────────────────────────────────*/
-function openDetail(id) {
-  const item = allNews.find(i => i.id === id);
+function openNewsDetail(id) {
+  const item = allNews.find(i => i.id == id);
   if (!item) return;
-
-  document.getElementById('detailTitle').textContent = item.title;
-  document.getElementById('detailBody').innerHTML = `
+  document.getElementById('newsDetailTitle').textContent = item.title;
+  document.getElementById('newsDetailBody').innerHTML = `
     <div class="detail-meta">
-      <span class="badge badge-green">${TYPE_NAME[item.type] || item.type}</span>
-      <span>发布人：${item.nickname || item.username}</span>
-      <span>${formatDate(item.createdAt)}</span>
+      <span>${TYPE_NAME[item.type] || item.type}</span>
+      <span>👤 ${item.author || '匿名'}</span>
+      <span>${formatDate(item.create_time)}</span>
     </div>
     <div class="detail-content">${item.content}</div>
     ${canDelete(item) ? `<button class="btn btn-danger btn-sm" style="margin-top:16px" onclick="deleteNews(${item.id})">删除</button>` : ''}
@@ -71,23 +64,20 @@ function openDetail(id) {
   openModal('newsDetailModal');
 }
 
-/* ── 发布资讯 ─────────────────────────────────────*/
 async function submitNews() {
   const title   = document.getElementById('newsTitle').value.trim();
   const type    = document.getElementById('newsType').value;
   const content = document.getElementById('newsContent').value.trim();
 
-  // 验证
   let ok = true;
-  if (!title)          { showErr('newsTitleErr');   ok = false; }
-  if (!type)           { showErr('newsTypeErr');    ok = false; }
+  if (!title)            { showErr('newsTitleErr');   ok = false; }
+  if (!type)             { showErr('newsTypeErr');    ok = false; }
   if (content.length < 10) { showErr('newsContentErr'); ok = false; }
   if (!ok) return;
 
-  const user = Auth.getUser();
-  const res  = await API.news.add({ title, type, content, username: user.username, nickname: user.nickname || user.username });
+  const res = await API.news.add({ title, type, content });
 
-  if (res.code === 200) {
+  if (res.code === 0) {
     showToast('发布成功！');
     closeModal('newsPublishModal');
     document.getElementById('newsTitle').value   = '';
@@ -99,11 +89,10 @@ async function submitNews() {
   }
 }
 
-/* ── 删除资讯 ─────────────────────────────────────*/
 async function deleteNews(id) {
   if (!confirm('确定删除这条资讯？')) return;
   const res = await API.news.remove(id);
-  if (res.code === 200) {
+  if (res.code === 0) {
     showToast('删除成功');
     closeModal('newsDetailModal');
     await loadNews();
@@ -112,11 +101,9 @@ async function deleteNews(id) {
   }
 }
 
-/* ── 工具函数 ─────────────────────────────────────*/
-// 判断当前用户是否可以删除（自己发的才能删）
 function canDelete(item) {
   const user = Auth.getUser();
-  return user && user.username === item.username;
+  return user && user.username === (item.author || item.username);
 }
 
 function showErr(id) {
@@ -125,14 +112,12 @@ function showErr(id) {
   setTimeout(() => el && el.classList.remove('show'), 3000);
 }
 
-// 通用 Tab 初始化
 function initTabs(tabsId, onChange) {
   document.querySelectorAll(`#${tabsId} .tab-btn`).forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll(`#${tabsId} .tab-btn`).forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      const type = btn.dataset.type || btn.dataset.cat || 'all';
-      onChange(type);
+      onChange(btn.dataset.type || 'all');
     });
   });
 }

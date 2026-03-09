@@ -6,7 +6,7 @@
 const mysql = require('mysql2/promise');
 
 const pool = mysql.createPool({
-  host: 'localhost',
+  host: '127.0.0.1',
   user: 'root',
   password: '', // <-- 填写你的 MySQL 密码
   database: 'campusconnect', // <-- 确保已创建该数据库
