@@ -1,23 +1,25 @@
 /* ===================================================
-   news.js —— 校园资讯页逻辑（已修复）
+   news.js —— 校园资讯页逻辑（修复+样式优化版）
+   修复：code===0，create_time字段
    =================================================== */
 
-const TYPE_NAME = { notice: '📢 校园通知', activity: '🎉 校园活动', lecture: '🎓 学术讲座', news: '📰 资讯' };
+const TYPE_NAME = { notice: '校园通知', activity: '校园活动', lecture: '学术讲座' };
+const TYPE_ICON = { notice: '📢', activity: '🎉', lecture: '🎓' };
+const TYPE_COLOR = { notice: '#3b82f6', activity: '#10b981', lecture: '#8b5cf6' };
 
-let allNews  = [];
-let curType  = 'all';
+let allNews = [];
+let curType = 'all';
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadNews();
   initTabs('newsTabs', (type) => { curType = type; renderNews(); });
   const s = document.getElementById('news-search');
   if (s) s.addEventListener('keyup', e => { if (e.key === 'Enter') renderNews(); });
-  if (typeof initNav === 'function') initNav();
 });
 
 async function loadNews() {
   const res = await API.news.list();
-  allNews   = res.code === 0 ? res.data : [];
+  allNews = res.code === 0 ? res.data : [];
   renderNews();
 }
 
@@ -34,29 +36,39 @@ function renderNews() {
     return;
   }
 
-  container.innerHTML = list.map(item => `
-    <div class="news-card" onclick="openNewsDetail(${item.id})">
-      <div class="news-cover">📰</div>
-      <div class="news-card-body">
-        <div class="news-card-title">${item.title}</div>
-        <div class="news-card-meta">
-          <span class="badge badge-green">${TYPE_NAME[item.type] || item.type}</span>
-          <span>${formatDate(item.create_time)}</span>
+  container.innerHTML = list.map(item => {
+    const color = TYPE_COLOR[item.type] || '#6b7280';
+    const icon  = TYPE_ICON[item.type]  || '📰';
+    const name  = TYPE_NAME[item.type]  || item.type || '资讯';
+    return `
+      <div class="news-card" onclick="openDetail(${item.id})">
+        <div class="news-cover" style="background: linear-gradient(135deg, ${color}22, ${color}11);">
+          <span class="news-cover-icon">${icon}</span>
+          <span class="news-type-badge" style="background:${color}">${name}</span>
+        </div>
+        <div class="news-card-body">
+          <div class="news-card-title">${item.title}</div>
+          <div class="news-card-excerpt">${(item.content || '').slice(0, 60)}${item.content && item.content.length > 60 ? '…' : ''}</div>
+          <div class="news-card-meta">
+            <span class="news-author">👤 ${item.author || '匿名'}</span>
+            <span class="news-time">🕐 ${formatDate(item.create_time)}</span>
+          </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
-function openNewsDetail(id) {
-  const item = allNews.find(i => i.id == id);
+function openDetail(id) {
+  const item = allNews.find(i => i.id === id);
   if (!item) return;
-  document.getElementById('newsDetailTitle').textContent = item.title;
-  document.getElementById('newsDetailBody').innerHTML = `
+  const color = TYPE_COLOR[item.type] || '#6b7280';
+  document.getElementById('detailTitle').textContent = item.title;
+  document.getElementById('detailBody').innerHTML = `
     <div class="detail-meta">
-      <span>${TYPE_NAME[item.type] || item.type}</span>
+      <span class="detail-badge" style="background:${color}22;color:${color}">${TYPE_ICON[item.type]||'📰'} ${TYPE_NAME[item.type]||item.type}</span>
       <span>👤 ${item.author || '匿名'}</span>
-      <span>${formatDate(item.create_time)}</span>
+      <span>🕐 ${formatDate(item.create_time)}</span>
     </div>
     <div class="detail-content">${item.content}</div>
     ${canDelete(item) ? `<button class="btn btn-danger btn-sm" style="margin-top:16px" onclick="deleteNews(${item.id})">删除</button>` : ''}
@@ -65,18 +77,15 @@ function openNewsDetail(id) {
 }
 
 async function submitNews() {
-  const title   = document.getElementById('newsTitle').value.trim();
-  const type    = document.getElementById('newsType').value;
-  const content = document.getElementById('newsContent').value.trim();
+  const title   = (document.getElementById('newsTitle')?.value   || '').trim();
+  const type    = (document.getElementById('newsType')?.value    || '').trim();
+  const content = (document.getElementById('newsContent')?.value || '').trim();
 
-  let ok = true;
-  if (!title)            { showErr('newsTitleErr');   ok = false; }
-  if (!type)             { showErr('newsTypeErr');    ok = false; }
-  if (content.length < 10) { showErr('newsContentErr'); ok = false; }
-  if (!ok) return;
+  if (!title)   { showFormErr('newsTitleErr');   return; }
+  if (!type)    { showFormErr('newsTypeErr');    return; }
+  if (!content) { showFormErr('newsContentErr'); return; }
 
   const res = await API.news.add({ title, type, content });
-
   if (res.code === 0) {
     showToast('发布成功！');
     closeModal('newsPublishModal');
@@ -90,7 +99,7 @@ async function submitNews() {
 }
 
 async function deleteNews(id) {
-  if (!confirm('确定删除这条资讯？')) return;
+  if (!confirm('确定删除？')) return;
   const res = await API.news.remove(id);
   if (res.code === 0) {
     showToast('删除成功');
@@ -103,13 +112,12 @@ async function deleteNews(id) {
 
 function canDelete(item) {
   const user = Auth.getUser();
-  return user && user.username === (item.author || item.username);
+  return user && (user.username === item.author || user.role === 'admin');
 }
 
-function showErr(id) {
+function showFormErr(id) {
   const el = document.getElementById(id);
-  if (el) el.classList.add('show');
-  setTimeout(() => el && el.classList.remove('show'), 3000);
+  if (el) { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 3000); }
 }
 
 function initTabs(tabsId, onChange) {
@@ -117,7 +125,7 @@ function initTabs(tabsId, onChange) {
     btn.addEventListener('click', () => {
       document.querySelectorAll(`#${tabsId} .tab-btn`).forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      onChange(btn.dataset.type || 'all');
+      onChange(btn.dataset.type || btn.dataset.cat || 'all');
     });
   });
 }

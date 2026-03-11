@@ -1,6 +1,5 @@
 /* ===================================================
-   pages.css —— 资讯、交易、失物、广场 四个页面共用样式
-   在 news.html / trade.html / lost.html / forum.html 均引入此文件
+   pages.css —— 资讯、交易、失物、广场 四个页面共用样式（优化版）
    =================================================== */
 
 /* ── 筛选栏 ───────────────────────────────────────*/
@@ -9,10 +8,8 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
-
-/* 价格筛选区 */
 .price-filter {
   display: flex;
   align-items: center;
@@ -28,7 +25,10 @@
 }
 .price-filter input:focus { border-color: var(--primary); }
 
-/* ── 资讯列表（news.html）────────────────────────*/
+
+/* ══════════════════════════════════════════════════
+   📰 校园资讯 - 杂志风格卡片
+══════════════════════════════════════════════════ */
 .news-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -36,35 +36,70 @@
 }
 
 .news-card {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  background: #fff;
+  border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.22s;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
 }
 .news-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(59,130,246,0.14);
+  transform: translateY(-4px);
+  border-color: #93c5fd;
 }
 
-/* 资讯封面图（没有图片时显示渐变色块）*/
+/* 封面区：彩色渐变背景 + 大图标 */
 .news-cover {
-  height: 140px;
-  background: linear-gradient(135deg, var(--primary-light), #ffffff);
+  height: 130px;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
+  overflow: hidden;
 }
-.news-cover img { width: 100%; height: 100%; object-fit: cover; }
+.news-cover-icon {
+  font-size: 3.2rem;
+  z-index: 1;
+}
+/* 类型角标 */
+.news-type-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
 
-.news-card-body { padding: 14px; }
+.news-card-body {
+  padding: 14px 16px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 .news-card-title {
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-main);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.news-card-excerpt {
+  font-size: 0.82rem;
+  color: var(--text-sub);
+  line-height: 1.55;
+  flex: 1;
+  margin-bottom: 10px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -74,28 +109,42 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: auto;
 }
 
-/* 资讯详情弹窗内容 */
+/* 资讯详情弹窗 */
 .detail-meta {
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
   font-size: 0.85rem;
   color: var(--text-muted);
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+.detail-badge {
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 .detail-content {
   font-size: 0.95rem;
-  line-height: 1.8;
+  line-height: 1.85;
   color: var(--text-main);
-  white-space: pre-wrap; /* 保留换行 */
+  white-space: pre-wrap;
 }
 
-/* ── 二手商品列表（trade.html）───────────────────*/
+
+/* ══════════════════════════════════════════════════
+   ♻️ 二手交易 - 商品卡片（价格突出）
+══════════════════════════════════════════════════ */
 .trade-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -103,250 +152,299 @@
 }
 
 .trade-card {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  background: #fff;
+  border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.22s;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
 }
 .trade-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(16,185,129,0.15);
+  transform: translateY(-4px);
+  border-color: #6ee7b7;
 }
 
-/* 商品图片占位 */
 .trade-cover {
-  height: 160px;
-  background: var(--bg-page);
+  height: 140px;
+  background: linear-gradient(135deg, #f0fdf4, #d1fae5);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
+  font-size: 3.5rem;
+  position: relative;
 }
 .trade-cover img { width: 100%; height: 100%; object-fit: cover; }
 
-.trade-card-body { padding: 12px; }
+.trade-card-body { padding: 12px 14px 14px; flex: 1; display: flex; flex-direction: column; }
 .trade-card-name {
   font-size: 0.92rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-main);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* 价格红色突出，配合绿色主题 */
 .trade-card-price {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--danger);
-  margin-bottom: 6px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #ef4444;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
 }
+
 .trade-card-meta {
-  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
   color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  margin-top: auto;
 }
 
 /* 商品详情弹窗 */
 .trade-detail-price {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--danger);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ef4444;
   margin: 12px 0;
 }
 .trade-detail-info {
   background: var(--bg-page);
   border-radius: var(--radius-sm);
-  padding: 14px;
+  padding: 16px;
   margin-bottom: 16px;
+  border: 1px solid var(--border);
 }
 .trade-detail-info p {
   font-size: 0.9rem;
   color: var(--text-sub);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  line-height: 1.6;
 }
 .trade-detail-info p:last-child { margin-bottom: 0; }
 .trade-detail-info strong { color: var(--text-main); }
 
-/* ── 失物招领列表（lost.html）────────────────────*/
-.lost-list { display: flex; flex-direction: column; gap: 14px; }
+
+/* ══════════════════════════════════════════════════
+   🔍 失物招领 - 横向卡片（状态标签明显）
+══════════════════════════════════════════════════ */
+.lost-list { display: flex; flex-direction: column; gap: 12px; }
 
 .lost-card {
-  background: #ffffff;
+  background: #fff;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 18px;
+  border-radius: 14px;
   display: flex;
-  gap: 16px;
-  align-items: flex-start;
+  align-items: stretch;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.22s;
+  overflow: hidden;
 }
 .lost-card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--primary);
+  box-shadow: 0 6px 20px rgba(245,158,11,0.14);
+  transform: translateY(-2px);
+  border-color: #fcd34d;
 }
 
-/* 失物类型图标 */
-.lost-type-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: var(--radius-sm);
+/* 左侧色条：类型标识 */
+.lost-card-left {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  flex-shrink: 0;
+  padding: 16px 14px;
+  min-width: 72px;
+  gap: 6px;
 }
-.lost-type-icon.lost  { background: #fee2e2; }  /* 丢失：红色背景 */
-.lost-type-icon.found { background: #d1fae5; }  /* 拾到：绿色背景 */
+.lost-type-emoji { font-size: 1.8rem; line-height: 1; }
+.lost-type-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.3px; }
 
-.lost-card-info { flex: 1; min-width: 0; }
+/* 中间主体 */
+.lost-card-body {
+  flex: 1;
+  padding: 14px 16px;
+  min-width: 0;
+}
 .lost-card-title {
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-main);
-  margin-bottom: 6px;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lost-card-desc {
+  font-size: 0.83rem;
+  color: var(--text-sub);
+  margin-bottom: 8px;
+  line-height: 1.5;
 }
 .lost-card-meta {
-  font-size: 0.82rem;
-  color: var(--text-sub);
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  font-size: 0.76rem;
+  color: var(--text-muted);
 }
 
-/* 右侧：找到/未找到状态 */
-.lost-card-status { flex-shrink: 0; }
-
-/* 标记已找到按钮 */
-.btn-found {
-  padding: 6px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 0.82rem;
-  font-weight: 600;
-  background: var(--primary-light);
-  color: var(--primary-dark);
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.btn-found:hover { background: #a7f3d0; }
-
-/* ── 校园广场（forum.html）───────────────────────*/
-
-/* 快速发帖框 */
-.quick-post {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  margin-bottom: 24px;
-}
-.quick-post-footer {
+/* 右侧：状态 */
+.lost-card-right {
   display: flex;
-  gap: 10px;
-  margin-top: 10px;
   align-items: center;
+  padding: 0 20px;
 }
 
-/* 帖子列表 */
+/* 状态标签 */
+.lost-badge {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.lost-badge-done  { background: #d1fae5; color: #059669; }
+.lost-badge-lost  { background: #fee2e2; color: #dc2626; }
+.lost-badge-found { background: #fef3c7; color: #d97706; }
+
+
+/* ══════════════════════════════════════════════════
+   💬 校园广场 - 已有 forum.js 负责，这里只补全样式
+══════════════════════════════════════════════════ */
 .forum-list { display: flex; flex-direction: column; gap: 14px; }
 
 .forum-card {
-  background: #ffffff;
+  background: #fff;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 18px;
+  border-radius: 14px;
+  padding: 18px 20px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.22s;
 }
 .forum-card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--primary);
+  box-shadow: 0 6px 20px rgba(139,92,246,0.12);
+  transform: translateY(-2px);
+  border-color: #c4b5fd;
 }
-
-.forum-card-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-/* 发帖人头像 */
-.forum-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--primary-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--primary-dark);
-  font-weight: 700;
-  font-size: 0.9rem;
-  flex-shrink: 0;
-}
-
-.forum-card-user { font-size: 0.88rem; font-weight: 600; color: var(--text-main); }
-.forum-card-time { font-size: 0.78rem; color: var(--text-muted); }
-
 .forum-card-title {
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-main);
   margin-bottom: 6px;
 }
-.forum-card-content {
-  font-size: 0.88rem;
+.forum-card-excerpt {
+  font-size: 0.85rem;
   color: var(--text-sub);
   line-height: 1.6;
+  margin-bottom: 10px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin-bottom: 12px;
+}
+.forum-card-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
 }
 
-.forum-card-footer {
+
+/* ══════════════════════════════════════════════════
+   个人主页 - 发布记录列表样式
+══════════════════════════════════════════════════ */
+.post-item {
   display: flex;
   align-items: center;
-  gap: 16px;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  padding-top: 10px;
-  border-top: 1px solid var(--border);
-}
-
-/* 回复区 */
-.reply-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
-.reply-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 14px; color: var(--text-main); }
-.reply-input { margin-top: 14px; }
-
-.reply-item {
-  background: var(--bg-page);
-  border-radius: var(--radius-sm);
-  padding: 12px;
+  gap: 14px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
   margin-bottom: 10px;
-  font-size: 0.88rem;
+  transition: all 0.18s;
 }
-.reply-item-user { font-weight: 600; color: var(--primary); margin-bottom: 4px; }
-.reply-item-content { color: var(--text-main); line-height: 1.6; }
-.reply-item-time { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+.post-item:hover {
+  box-shadow: var(--shadow-sm);
+  border-color: #d1d5db;
+}
 
-/* 删除按钮（自己发的内容才显示）*/
-.btn-delete-post {
-  padding: 4px 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid #fca5a5;
-  background: transparent;
-  color: var(--danger);
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin-left: auto;
+.post-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
 }
-.btn-delete-post:hover { background: #fee2e2; }
+
+.post-info { flex: 1; min-width: 0; }
+.post-title {
+  font-size: 0.93rem;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+.post-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.post-time   { font-size: 0.76rem; color: var(--text-muted); }
+.post-price  { font-size: 0.82rem; font-weight: 700; color: #ef4444; }
+.post-reply  { font-size: 0.78rem; color: #8b5cf6; }
+
+.post-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+.post-badge.found   { background: #d1fae5; color: #059669; }
+.post-badge.seeking { background: #fef3c7; color: #d97706; }
+
+.post-delete-btn {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.post-delete-btn:hover { background: #fecaca; }
+
+
+/* ── 通用组件 ─────────────────────────────────── */
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+.empty-icon { font-size: 3rem; margin-bottom: 12px; }
+.empty-state p { font-size: 0.95rem; }
 
 /* 加载提示 */
 .loading-tip {
@@ -354,4 +452,44 @@
   padding: 40px;
   color: var(--text-muted);
   font-size: 0.9rem;
+}
+
+/* 搜索栏 */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #fff;
+}
+.search-bar input {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  outline: none;
+  font-size: 0.9rem;
+}
+.search-bar button {
+  padding: 8px 14px;
+  background: var(--bg-page);
+  border: none;
+  border-left: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--text-sub);
+  transition: background 0.15s;
+}
+.search-bar button:hover { background: var(--border); }
+
+/* 响应式 */
+@media (max-width: 900px) {
+  .news-grid  { grid-template-columns: repeat(2, 1fr); }
+  .trade-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .news-grid  { grid-template-columns: 1fr; }
+  .trade-grid { grid-template-columns: repeat(2, 1fr); }
+  .lost-card-right { padding: 0 12px; }
 }
